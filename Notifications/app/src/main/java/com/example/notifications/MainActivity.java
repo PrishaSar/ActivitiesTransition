@@ -16,12 +16,14 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
 public class MainActivity extends AppCompatActivity {
 
+    public static int nCount = 0;
 
     Button button;
 
@@ -29,7 +31,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         button = findViewById(R.id.notifButton);
 
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU){
@@ -39,9 +40,32 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
+
+
+    }
+
+    public void startNotifLoop(View v){
+
+        Intent stateIntent = new Intent(this, GotchiBroadcastReceiver.class);
+        stateIntent.putExtra("id", 100);
+        PendingIntent pendingIntent =
+                PendingIntent.getBroadcast(this, 0, stateIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        new CountDownTimer(30000, 7000) {
+            public void onTick(long millisUntilFinished) {
+                makeNotification(v, pendingIntent);
+                Log.i("gotchi", "notif given");
+            }
+            @Override
+            public void onFinish() {
+                Log.i("gotchi", "Done being tired!");
+            }
+
+        }.start();
     }
 
 
+    ///need to set first notif, and then after put notifs in broadcast!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
     public void makeNotification(View v){
         String CHANNEL_ID = "TEST_ID";
@@ -49,7 +73,8 @@ public class MainActivity extends AppCompatActivity {
         builder.setSmallIcon(R.drawable.ic_android_pink)
             .setContentTitle("Test Notif")
             .setContentText("hellloo worlddd!!")
-            .setAutoCancel(true).setPriority(NotificationCompat.PRIORITY_DEFAULT);
+            .setAutoCancel(true).setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .addAction(R.drawable.ic_launcher_background,"hello", pendingIntent);
 
         Intent intent = new Intent(getApplicationContext(), AlertDetails.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -60,7 +85,7 @@ public class MainActivity extends AppCompatActivity {
         builder.setContentIntent(pendingIntent);
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
-
+        ////don't need this
 
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             NotificationChannel notificationChannel = notificationManager.getNotificationChannel(CHANNEL_ID);
@@ -74,7 +99,9 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        notificationManager.notify(0, builder.build());
+        notificationManager.notify(nCount, builder.build());
+        nCount ++;
+        Log.i("gotchi", "notif passed!");
 
 
 
