@@ -21,6 +21,9 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
+import android.content.Intent;
+
+
 public class MainActivity extends AppCompatActivity {
 
     public static int nCount = 0;
@@ -40,20 +43,32 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-
-
     }
+
+    //when the app closes, this is what we do:
+    @Override
+    protected void onStop () {
+        super.onStop();
+        startService(new Intent(this, NotificationService.class));
+    }
+    public void closeApp (View view) {
+        finish();
+    }
+
+
+    /////+___s=a9dfdsmvgvdfvtyghujre tyrtyb
+
 
     public void startNotifLoop(View v){
 
-        Intent stateIntent = new Intent(this, GotchiBroadcastReceiver.class);
-        stateIntent.putExtra("id", 100);
-        PendingIntent pendingIntent =
-                PendingIntent.getBroadcast(this, 0, stateIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+//      p2:  Intent stateIntent = new Intent(this, GotchiBroadcastReceiver.class);
+//      p2:  stateIntent.putExtra("id", 100);
+//      p2:  PendingIntent pendingIntent =
+//      p2:          PendingIntent.getBroadcast(this, 0, stateIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         new CountDownTimer(30000, 7000) {
             public void onTick(long millisUntilFinished) {
-                makeNotification(v, pendingIntent);
+                makeNotification(v);
                 Log.i("gotchi", "notif given");
             }
             @Override
@@ -73,8 +88,8 @@ public class MainActivity extends AppCompatActivity {
         builder.setSmallIcon(R.drawable.ic_android_pink)
             .setContentTitle("Test Notif")
             .setContentText("hellloo worlddd!!")
-            .setAutoCancel(true).setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                .addAction(R.drawable.ic_launcher_background,"hello", pendingIntent);
+            .setAutoCancel(true).setPriority(NotificationCompat.PRIORITY_DEFAULT);
+//         p2:       .addAction(R.drawable.ic_launcher_background,"hello", pendingIntent);
 
         Intent intent = new Intent(getApplicationContext(), AlertDetails.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
